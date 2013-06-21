@@ -27,13 +27,16 @@ class Hiera
 
             ## key_dir is the location of our GPG private keys
             ## default: ~/.gnupg
-            key_dir = Backend.parse_string(Config[:gpg][:key_dir], scope) || "#{ENV[real_home]}/.gnupg"
+            key_dir = Config[:gpg][:key_dir] || "#{ENV[real_home]}/.gnupg"
+
+            ## agent_info is the location to load the GPG_AGENT_INFO env var from
+            agent_info_file = Config[:gpg][:agent_info] || "/var/run/puppet/puppet-gpg"
 
 
             Backend.datasources(scope, order_override) do |source|
                 gpgfile = Backend.datafile(:gpg, scope, source, "gpg") || next
 
-                plain = decrypt(gpgfile, key_dir)
+                plain = decrypt(gpgfile, key_dir, agent_info_file)
                 next if !plain
                 next if plain.empty?
                 debug("GPG decrypt returned valid data")
@@ -73,10 +76,13 @@ class Hiera
             return answer
         end
 
-        def decrypt(file, gnupghome)
+        def decrypt(file, gnupghome, agent_info_file)
 
             ENV["GNUPGHOME"]=gnupghome
             debug("GNUPGHOME is #{ENV['GNUPGHOME']}")
+
+            ENV["GPG_AGENT_INFO"]=File.open(agent_info_file, &:readline).sub("GPG_AGENT_INFO=","")
+            debug("GPG_AGENT_INFO is #{ENV['GPG_AGENT_INFO']}")
 
             ctx = GPGME::Ctx.new
 
