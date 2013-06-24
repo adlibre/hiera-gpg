@@ -3,11 +3,11 @@ require 'rake/gempackagetask'
 
 spec = Gem::Specification.new do |gem|
     gem.name = "hiera-gpg"
-    gem.version = "1.1.0"
+    gem.version = "1.1.1"
     gem.summary = "GPG backend for Hiera"
     gem.email = "craig@craigdunn.org"
     gem.author = "Craig Dunn"
-    gem.homepage = "http://github.com/crayfishx/hiera-gpg"
+    gem.homepage = "http://github.com/adlibre/hiera-gpg"
     gem.description = "Hiera backend for storing secret data and decrypting with GPG"
     gem.require_path = "lib"
     gem.files = FileList["lib/**/*"].to_a

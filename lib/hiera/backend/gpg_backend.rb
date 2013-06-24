@@ -81,8 +81,12 @@ class Hiera
             ENV["GNUPGHOME"]=gnupghome
             debug("GNUPGHOME is #{ENV['GNUPGHOME']}")
 
-            ENV["GPG_AGENT_INFO"]=File.open(agent_info_file, &:readline).sub("GPG_AGENT_INFO=","")
-            debug("GPG_AGENT_INFO is #{ENV['GPG_AGENT_INFO']}")
+            begin
+                ENV["GPG_AGENT_INFO"]=File.open(agent_info_file, &:readline).sub("GPG_AGENT_INFO=","")
+                debug("GPG_AGENT_INFO is #{ENV['GPG_AGENT_INFO']}")
+            rescue EOFError, Errno::ENOENT
+                debug("GPG_AGENT_INFO is missing")
+            end
 
             ctx = GPGME::Ctx.new
 
